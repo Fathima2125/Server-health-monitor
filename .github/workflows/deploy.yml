@@ -6,32 +6,32 @@ on:
       - main
 
 jobs:
-
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # (Optional) Debug step – remove after first success
+      - name: Debug SSH Key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" | head -n 2
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
-
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
 
           script: |
-
-            cd server-health-monitor
+            cd server-health-monitor || exit 1
 
             git pull origin main
 
             sudo docker stop health-container || true
-
             sudo docker rm health-container || true
 
             sudo docker build -t health-monitor-api .
