@@ -39,4 +39,5 @@ jobs:
             sudo docker run -d \
               --name health-container \
               -p 3000:3000 \
+              --restart always \
               health-monitor-api
