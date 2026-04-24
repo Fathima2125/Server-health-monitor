@@ -21,18 +21,22 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-            cd Server-health-monitor || exit 1
+              cd Server-health-monitor || exit 1
 
-            git pull origin main
+              git pull origin main
 
-            sudo docker stop health-container || true
-            sudo docker rm health-container || true
+      
+              sudo docker ps -q --filter "publish=3000" | xargs -r sudo docker stop || true
+              sudo docker ps -aq --filter "publish=3000" | xargs -r sudo docker rm || true
 
-            sudo docker build -t health-monitor-api .
+              sudo docker stop health-container || true
+              sudo docker rm health-container || true
 
-            sudo docker run -d \
+              sudo docker build -t health-monitor-api .
+
+              sudo docker run -d \
               --name health-container \
               -p 3000:3000 \
               --restart always \
-              health-monitor-api
+               health-monitor-api
  
